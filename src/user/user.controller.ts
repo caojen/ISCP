@@ -1,8 +1,8 @@
-import { Body, Controller, Delete, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpException, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { removeKeys } from 'src/util/global.functions';
 import { shouldNotNull } from 'src/util/nonull.function';
-import { RegisterBody, User } from './user.entity';
+import { RegisterBody, UpdateInfoBody, User } from './user.entity';
 import { LoginRequired, NotLogin } from './user.guard';
 import { UserService } from './user.service';
 
@@ -50,5 +50,20 @@ export class UserController {
     const res = await this.userService.userLogout(sessionId);
     response.clearCookie('iscp-session-id');
     response.json(res);
+  }
+
+  @Put('info')
+  @UseGuards(LoginRequired)
+  async updateUserInfo (@Req() request, @Body() body: UpdateInfoBody) {
+    const uid = request.user.uid;
+    const info = body;
+
+    if (Object.keys(info).length === 0) {
+      throw new HttpException({
+        msg: '无修改'
+      }, 200);
+    }
+
+    return await this.userService.updateUserInfo(uid, info);
   }
 }

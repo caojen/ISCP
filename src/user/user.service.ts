@@ -2,7 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { EncryptService } from 'src/encrypt/encrypt.service';
 import { MysqlService } from 'src/mysql/mysql.service';
 import { RedisService } from 'src/redis/redis.service';
-import { RegisterBody, School, User } from './user.entity';
+import { RegisterBody, School, UpdateInfoBody, User } from './user.entity';
 
 @Injectable()
 export class UserService {
@@ -193,6 +193,35 @@ export class UserService {
     await this.redisService.del(sessionId)
     return {
       msg: '登出成功'
+    }
+  }
+
+  async updateUserInfo (uid: number, info: UpdateInfoBody) {
+    if (info.name) {
+      const updateName = `
+        UPDATE user
+        SET name=?
+        WHERE uid=?;
+      `;
+      await this.mysqlService.query(updateName, [info.name, uid]);
+    }
+
+    if (info.school) {
+      let sid = await this.getSidBySchoolName(info.school);
+      if (sid === null) {
+        sid = await this.createSchool(info.school);
+      }
+      const updateSchool = `
+        UPDATE user
+        SET sid=?
+        WHERE uid=?;
+      `;
+
+      await this.mysqlService.query(updateSchool, [sid, uid]);
+    }
+
+    return {
+      msg: '修改信息成功'
     }
   }
 }

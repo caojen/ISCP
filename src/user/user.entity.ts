@@ -19,3 +19,8 @@ export class RegisterBody {
   name: string;
   school: string;
 }
+
+export class UpdateInfoBody {
+  name?: string;
+  school?: string;
+}
