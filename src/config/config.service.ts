@@ -8,12 +8,13 @@ export class Config {
     port: number;
     username: string;
     password: string;
+    database: string;
   };
   redis: {
     host: string;
     port: number;
     password: string;
-  }
+  };
 }
 
 @Injectable()
@@ -25,7 +26,8 @@ export class ConfigService {
         host: "127.0.0.1",
         port: 3306,
         username: "root",
-        password: "OPENtextfile+123"
+        password: "OPENtextfile+123",
+        database: "iscp"
       };
       config.redis = {
         host: "127.0.0.1",
@@ -37,7 +39,8 @@ export class ConfigService {
         host: "127.0.0.1",
         port: 3306,
         username: process.env.MYSQL_USERNAME,
-        password: process.env.MYSQL_PASSWORD
+        password: process.env.MYSQL_PASSWORD,
+        database: "iscp"
       };
       config.redis = {
         host: "127.0.0.1",
