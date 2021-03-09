@@ -33,7 +33,7 @@ export class MysqlService {
     });
   }
 
-  async query (sql: string, params: any[] = []) {
+  async query (sql: string, params: any[] = []): Promise<any> {
     const isSelect = sql.trim().substr(0, 6).toLocaleLowerCase() === 'SELECT';
     try {
       if (isSelect) {
