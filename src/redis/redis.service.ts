@@ -16,7 +16,9 @@ export class RedisService {
   set (key: string, value: string, expire: number = 72000) {
     return new Promise(resolve => {
       RedisService.redisClient.set(key, value);
-      RedisService.redisClient.expire(key, expire, resolve)
+      RedisService.redisClient.expire(key, expire, (err, res) => {
+        resolve(res);
+      })
     });
   }
 
@@ -30,7 +32,9 @@ export class RedisService {
 
   del (key: string) {
     return new Promise(resolve => {
-      RedisService.redisClient.del(key)
+      RedisService.redisClient.del(key, (err, res) => {
+        resolve(res);
+      })
     })
   }
 }

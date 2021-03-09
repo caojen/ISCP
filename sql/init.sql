@@ -12,6 +12,7 @@ create table if not exists `iscp`.`user` (
   `password` varchar(1024) not null,
   `usertype` enum('admin', 'user') not null default 'user',
   `sid` integer not null,
+  `name` varchar(64) not null,
   primary key (`uid`),
   unique index `user_username_unique_index` (`username` asc),
   constraint `user_sid_ref_school_sid`

@@ -12,3 +12,10 @@ export class School {
   sid?: number;
   name?: string;
 };
+
+export class RegisterBody {
+  username: string;
+  password: string;
+  name: string;
+  school: string;
+}

@@ -25,7 +25,7 @@ export class EncryptService {
       padding = this.genPadding();
     }
     let res = crypto.createHash('md5')
-      .update(plain).digest('hex');
+      .update(`${padding}${plain}`).digest('hex');
     res = `${padding}\$${res}`;
     return [padding, res];
   }
@@ -37,6 +37,8 @@ export class EncryptService {
    */
   static verify (str: string, target: string) {
     const [padding, _] = str.split('$');
-    return str === EncryptService.encode(target, padding)[1];
+    const afterEncode = EncryptService.encode(target, padding)[1];
+    const result = str === afterEncode
+    return result;
   }
 }

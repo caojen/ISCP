@@ -1,5 +1,6 @@
 import { CanActivate, ExecutionContext, HttpException, Injectable } from "@nestjs/common";
 import { Request } from "express";
+import { iif } from "rxjs";
 import { UserService } from "./user.service";
 
 function getCookies(request: Request, key: string) {
@@ -22,14 +23,35 @@ export class LoginRequired implements CanActivate {
   ): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const sessionId = getCookies(request, 'iscp-session-id');
-    const user = await this.userService.getUser(sessionId);
-    if (!user) {
-      throw new HttpException({
-        msg: '未登录'
-      }, 403);
-    } else {
-      request.user = user;
-      return true;
+    if (sessionId) {
+      const user = await this.userService.getUser(sessionId);
+      if (user) {
+        request.user = user;
+        return true;
+      }
     }
+    throw new HttpException({
+      msg: '未登录'
+    }, 403);
+  }
+}
+
+@Injectable()
+export class NotLogin implements CanActivate {
+  constructor (
+    private readonly userService: UserService
+  ) {}
+
+  async canActivate (
+    context: ExecutionContext
+  ): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const sessionId = getCookies(request, 'iscp-session-id');
+    if (sessionId) {
+      throw new HttpException({
+        msg: '当前浏览器已登录用户，请删除缓存后重试'
+      }, 406);
+    }
+    return true;
   }
 }

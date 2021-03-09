@@ -34,13 +34,14 @@ export class MysqlService {
   }
 
   async query (sql: string, params: any[] = []): Promise<any> {
-    const isSelect = sql.trim().substr(0, 6).toLocaleLowerCase() === 'SELECT';
+    const isSelect = sql.trim().substr(0, 6).toLocaleLowerCase() === 'select';
     try {
       if (isSelect) {
         const res = await this.selectedPool.query(sql, params);
         return res[0];
       } else {
-        return await this.executePool.query(sql, params);
+        const res = await this.executePool.query(sql, params);
+        return res[0];
       }
     } catch (err) {
       this.logger.log(["数据库查询出错", sql, params]);
