@@ -70,7 +70,7 @@ export class UserController {
   @Put('password')
   @UseGuards(LoginRequired)
   async updatePassword (@Req() request, @Body() body: { password: string }) {
-    const uid = request.user.info;
+    const uid = request.user.uid;
     const { password } =  body;
     return await this.userService.updatePassword(uid, password);
   }

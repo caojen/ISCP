@@ -49,7 +49,7 @@ export class NotLogin implements CanActivate {
     const sessionId = getCookies(request, 'iscp-session-id');
     if (sessionId) {
       throw new HttpException({
-        msg: '当前浏览器已登录用户，请删除缓存后重试'
+        msg: '当前浏览器已登录用户，请登出或删除缓存后重试'
       }, 406);
     }
     return true;

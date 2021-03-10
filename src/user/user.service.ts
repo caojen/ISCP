@@ -234,7 +234,7 @@ export class UserService {
       set password=?
       where uid=?;
     `;
-
+    console.log('update password', uid, truePass);
     await this.mysqlService.query(update, [truePass, uid]);
     return {
       msg: '修改密码成功'
