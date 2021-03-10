@@ -20,12 +20,10 @@ export class ContestController {
     return await this.contestService.getContestByCode (code);
   }
 
-  @Get(':cid')
+  @Get('all')
   @UseGuards(AdminRequired)
-  async getContestByCid (@Param() param: { cid: number }) {
-    const { cid } = param;
-    shouldBeInteger([cid]);
-    return await this.contestService.getContestByCid (cid);
+  async getAllContests () {
+    return await this.contestService.getContestsList()
   }
 
   @Post('')
@@ -117,5 +115,13 @@ export class ContestController {
     shouldNotNull([code]);
     shouldBeInteger([eid]);
     return await this.contestService.deleteOneStudentInOneContest(uid, code, eid);
+  }
+
+  @Get(':cid')
+  @UseGuards(AdminRequired)
+  async getContestByCid (@Param() param: { cid: number }) {
+    const { cid } = param;
+    shouldBeInteger([cid]);
+    return await this.contestService.getContestByCid (cid);
   }
 }

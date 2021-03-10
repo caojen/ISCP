@@ -1,6 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { MysqlService } from 'src/mysql/mysql.service';
-import { RedisService } from 'src/redis/redis.service';
 import { Contest } from './contest.entity';
 
 @Injectable()
@@ -81,19 +80,29 @@ export class ContestService {
 
   async getContestsList () {
     const sql = `
-      select cid, title, due, code, config,
-        count(*) as total, count(distinct uid) as teacher
+      select contest.cid as cid, title, due, code, config,
+        count(eid) as total, count(distinct uid) as teacher
       from contest
-        natural join enroll
-      group by cid;
+        left join enroll on contest.cid = enroll.cid
+      group by contest.cid;
     `;
 
     const result = await this.mysqlService.query(sql);
-    console.log(result);
-
-    throw new HttpException({
-      msg: 'unimplemented!'
-    }, 500);
+    const res = []
+    for (const item of result) {
+      res.push({
+        cid: item.cid,
+        title: item.title,
+        due: new Date(item.due),
+        code: item.code,
+        config: JSON.parse(item.config),
+        summary: {
+          studentCount: item.total,
+          userCount: item.teacher
+        }
+      });
+    }
+    return res;
   }
 
   async createOneContest (contest: Contest) {
@@ -102,15 +111,20 @@ export class ContestService {
       values(?, ?, ?, ?);
     `;
 
-    const insertRes = await this.mysqlService.query(sql, [
-      contest.title,
-      new Date(contest.due),
-      contest.code,
-      JSON.stringify(contest.config)
-    ]);
-
-    const cid = insertRes.insertId;
-    contest.cid = cid;
+    try {
+      const insertRes = await this.mysqlService.query(sql, [
+        contest.title,
+        new Date(contest.due),
+        contest.code,
+        JSON.stringify(contest.config)
+      ]);
+      const cid = insertRes.insertId;
+      contest.cid = cid;
+    } catch {
+      throw new HttpException({
+        msg: '数据库查询出错，换个比赛码试试?'
+      }, 500);
+    }
     return contest;
   }
 
@@ -255,6 +269,7 @@ export class ContestService {
         ...JSON.parse(item.detail)
       });
     }
+    return res;
   }
 
   async updateOneStudentInfoInOneContest (uid: number, code: string, eid: number, body: any) {
