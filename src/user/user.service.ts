@@ -58,6 +58,7 @@ export class UserService {
     res.school.sid = user[0].sid;
     res.school.name = user[0].school_name;
     res.sessionId = sessionId;
+    res.usertype = user[0].usertype;
     return res;
   }
 
@@ -91,6 +92,7 @@ export class UserService {
       res.school.sid = user[0].sid;
       res.school.name = user[0].school_name;
       res.sessionId = await this.genSession(res.uid);
+      res.usertype = user[0].usertype;
       return res;
     }
   }
@@ -222,6 +224,20 @@ export class UserService {
 
     return {
       msg: '修改信息成功'
+    }
+  }
+
+  async updatePassword(uid: number, password: string) {
+    const [padding, truePass] = EncryptService.encode(password);
+    const update = `
+      update user
+      set password=?
+      where uid=?;
+    `;
+
+    await this.mysqlService.query(update, [truePass, uid]);
+    return {
+      msg: '修改密码成功'
     }
   }
 }

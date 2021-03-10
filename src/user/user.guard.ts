@@ -55,3 +55,28 @@ export class NotLogin implements CanActivate {
     return true;
   }
 }
+
+@Injectable()
+export class AdminRequired implements CanActivate {
+  constructor (
+    private readonly userService: UserService
+  ) {}
+
+  async canActivate (
+    context: ExecutionContext
+  ): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const sessionId = getCookies(request, 'iscp-session-id');
+    if (sessionId) {
+      const admin = await this.userService.getUser(sessionId);
+      if (admin.usertype === 'admin') {
+        request.admin = admin;
+        return true;
+      }
+    }
+
+    throw new HttpException({
+      msg: 'Permission Denied'
+    }, 403);
+  }
+}

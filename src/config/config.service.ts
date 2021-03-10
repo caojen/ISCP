@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
-export const env = "test"
+export const env: "test" | "dev" 
+                = "test";
 
 export class Config {
   mysql: {

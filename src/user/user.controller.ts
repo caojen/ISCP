@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpException, Post, Put, Req, Res, UseGuards } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { request, Request, Response } from 'express';
 import { removeKeys } from 'src/util/global.functions';
 import { shouldNotNull } from 'src/util/nonull.function';
 import { RegisterBody, UpdateInfoBody, User } from './user.entity';
@@ -65,5 +65,13 @@ export class UserController {
     }
 
     return await this.userService.updateUserInfo(uid, info);
+  }
+
+  @Put('password')
+  @UseGuards(LoginRequired)
+  async updatePassword (@Req() request, @Body() body: { password: string }) {
+    const uid = request.user.info;
+    const { password } =  body;
+    return await this.userService.updatePassword(uid, password);
   }
 }
