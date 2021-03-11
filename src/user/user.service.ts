@@ -33,6 +33,11 @@ export class UserService {
 
   async getUser (sessionId: string): Promise<User> {
     const uid = parseInt(await this.redisService.get(sessionId));
+    if (isNaN(uid)) {
+      throw new HttpException({
+        msg: '未登录'
+      }, 403);
+    }
     const sql = `
       select user.uid as uid,
         user.username as username,
