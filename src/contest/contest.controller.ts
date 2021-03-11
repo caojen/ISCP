@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { AdminRequired, LoginRequired } from 'src/user/user.guard';
 import { UserService } from 'src/user/user.service';
 import { shouldBeInteger, shouldNotNull } from 'src/util/nonull.function';
@@ -72,6 +73,25 @@ export class ContestController {
     const { code } = query;
     shouldNotNull([code]);
     return await this.contestService.addManyStudentsToOneContest(uid, code, body);
+  }
+
+  @Post('students/file')
+  @UseGuards(LoginRequired)
+  @UseInterceptors(FileInterceptor('file', {
+    limits: {fileSize: 50 * 1024 * 1024},
+    fileFilter: (req, file, cb) => {
+      cb(null, true);
+    }
+  }))
+  async addManyStudentsToOneContestWithFile (
+    @Req() request: any,
+    @Query() query: { code: string },
+    @UploadedFile() file: { buffer: Buffer }
+  ) {
+    const uid = request.user.uid;
+    const { code } = query;
+    shouldNotNull([code]);
+    return await this.contestService.addManyStudentsToOneContestWithFile(uid, code, file.buffer);
   }
 
   @Get('students')

@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { MysqlService } from 'src/mysql/mysql.service';
 import { Contest } from './contest.entity';
+import * as xlsx from 'xlsx';
 
 @Injectable()
 export class ContestService {
@@ -244,11 +245,15 @@ export class ContestService {
       return {
         msg: '所有学生上传成功'
       };
-    } else {
+    } else if (failed.length !== infos.length) {
       throw new HttpException({
         msg: '部分学生上传成功',
         failed
       }, 207);
+    } else {
+      throw new HttpException({
+        msg: '所有学生上传失败'
+      }, 406);
     }
   }
 
@@ -344,5 +349,19 @@ export class ContestService {
     return {
       msg: '删除学生成功'
     }
+  }
+
+  async addManyStudentsToOneContestWithFile (uid: number, code: string, file: Buffer) {
+    const workbook = xlsx.read(file);
+    const sheet = workbook.Sheets.Sheet1;
+    const json = xlsx.utils.sheet_to_json(sheet);
+
+    if (json.length === 0) {
+      throw new HttpException({
+        msg: '未检测到学生，请检测文件内容是否正确'
+      }, 406)
+    }
+
+    return await this.addManyStudentsToOneContest(uid, code, json);
   }
 }
