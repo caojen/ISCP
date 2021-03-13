@@ -7,11 +7,8 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 const PORT = 5003;
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create(AppModule);
   app.use(requestListening);
-  app.setGlobalPrefix('/api');
-  // app.use('/*', express.static('static'));
-  app.useStaticAssets('../static')
   await app.listen(PORT);
 }
 bootstrap();

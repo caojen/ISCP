@@ -353,7 +353,7 @@ export class ContestService {
 
   async addManyStudentsToOneContestWithFile (uid: number, code: string, file: Buffer) {
     const workbook = xlsx.read(file);
-    const sheet = workbook.Sheets.Sheet1;
+    const sheet = workbook.Sheets['导出模版'];
     const json = xlsx.utils.sheet_to_json(sheet);
 
     if (json.length === 0) {
