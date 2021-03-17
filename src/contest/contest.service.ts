@@ -11,7 +11,7 @@ export class ContestService {
 
   async getContestByCode (code: string) {
     const sql = `
-      select cid, title, due, config
+      select cid, title, due, config, extra
       from contest
       where code=?;
     `;
@@ -30,13 +30,14 @@ export class ContestService {
     r.due = new Date(contest.due);
     r.config = JSON.parse(contest.config);
     r.code = contest.code;
+    r.extra = contest.extra;
 
     return r;
   }
 
   async getContestByCid (cid: number) {
     const contestSql = `
-      select cid, title, due, config, code
+      select cid, title, due, config, code, extra
       from contest
       where cid=?;
     `;
@@ -55,6 +56,7 @@ export class ContestService {
     r.due = new Date(contest.due);
     r.config = JSON.parse(contest.config);
     r.code = contest.code;
+    r.extra = contest.extra;
 
     // 汇总统计信息:
     const countSql = `
@@ -81,7 +83,7 @@ export class ContestService {
 
   async getContestsList () {
     const sql = `
-      select contest.cid as cid, title, due, code, config,
+      select contest.cid as cid, title, due, code, config, extra,
         count(eid) as total, count(distinct uid) as teacher
       from contest
         left join enroll on contest.cid = enroll.cid
@@ -97,6 +99,7 @@ export class ContestService {
         due: new Date(item.due),
         code: item.code,
         config: JSON.parse(item.config),
+        extra: item.extra,
         summary: {
           studentCount: item.total,
           userCount: item.teacher
@@ -108,8 +111,8 @@ export class ContestService {
 
   async createOneContest (contest: Contest) {
     const sql = `
-      insert into contest(title, due, code, config)
-      values(?, ?, ?, ?);
+      insert into contest(title, due, code, config, extra)
+      values(?, ?, ?, ?, ?);
     `;
 
     try {
@@ -117,7 +120,8 @@ export class ContestService {
         contest.title,
         new Date(contest.due),
         contest.code,
-        JSON.stringify(contest.config)
+        JSON.stringify(contest.config),
+        contest.extra || ''
       ]);
       const cid = insertRes.insertId;
       contest.cid = cid;

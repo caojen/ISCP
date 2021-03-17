@@ -4,4 +4,5 @@ export class Contest {
   due?: Date;
   config?: string[];
   code?: string;
+  extra?: string;
 }
