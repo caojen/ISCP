@@ -182,7 +182,18 @@ export class ContestService {
       response[index].students.push(JSON.parse(item.detail));
     }
 
-    return response;
+    // return response;
+
+    const students = [];
+    for (const r of response) {
+      for (const s of r.students) {
+        s.teacher = r.user.name;
+        s.teacher_school = r.user.school.name;
+        students.push(s);
+      }
+    }
+
+    return students;
   }
 
   async addOneStudentToOneContest (uid: number, code: string, info: any) {
