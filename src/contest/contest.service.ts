@@ -265,12 +265,12 @@ export class ContestService {
       let isFailed = false;
       for (const key of config) {
         if (keys.indexOf(key) === -1) {
-          failed.push(info)
-          isFailed = true;
-          break;
-        } else {
-          r[key] = info[key];
+          // failed.push(info)
+          // isFailed = true;
+          // break;
+          info[key] = '';
         }
+        r[key] = info[key];
       }
 
       if (!isFailed) {
@@ -402,5 +402,25 @@ export class ContestService {
     }
 
     return await this.addManyStudentsToOneContest(uid, code, json);
+  }
+
+  async updateContestInfo (cid: number, body: Contest) {
+    const contest = await this.getContestByCid(cid);
+
+    const sql = `
+      UPDATE contest
+      SET due=?, code=?, extra=?, title=?
+      WHERE cid=?;
+    `;
+
+    await this.mysqlService.query(sql, [
+      body.due || contest.due,
+      body.code || contest.code,
+      body.extra || contest.extra,
+      body.title || contest.title,
+      cid
+    ]);
+
+    return await this.getContestByCid(cid);
   }
 }

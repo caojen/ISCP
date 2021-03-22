@@ -144,4 +144,12 @@ export class ContestController {
     shouldBeInteger([cid]);
     return await this.contestService.getContestByCid (cid);
   }
+
+  @Put(':cid')
+  @UseGuards(AdminRequired)
+  async updateContestInfo (@Param() param: { cid: number }, @Body() body: Contest) {
+    const { cid } = param;
+    shouldBeInteger([cid]);
+    return await this.contestService.updateContestInfo(cid, body);
+  }
 }
