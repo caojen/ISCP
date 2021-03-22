@@ -9,6 +9,24 @@ export class ContestService {
     private readonly mysqlService: MysqlService
   ) {}
 
+  async canSubmit (cid: number) {
+    const sql = `
+      select due
+      from contest
+      where cid=?;
+    `;
+
+    const query = (await this.mysqlService.query(sql, [cid]))[0];
+    const due = query.due;
+
+    const now = new Date();
+    if (now > due) {
+      throw new HttpException({
+        msg: '比赛报名已截止'
+      }, 403);
+    }
+  }
+
   async getContestByCode (code: string) {
     const sql = `
       select cid, title, due, config, extra
@@ -218,6 +236,8 @@ export class ContestService {
       values(?, ?, ?);
     `;
 
+    await this.canSubmit(contest.cid);
+
     await this.mysqlService.query(sql, [uid, contest.cid, JSON.stringify(r)]);
 
     return {
@@ -228,6 +248,8 @@ export class ContestService {
   async addManyStudentsToOneContest (uid: number, code: string, infos: any[]) {
     // 选出code对应的contest:
     const contest = await this.getContestByCode(code);
+    await this.canSubmit(contest.cid);
+
     const config = contest.config;
 
     const failed = [];
@@ -296,6 +318,7 @@ export class ContestService {
     // 得到cid
     const contest = await this.getContestByCode(code);
     const cid = contest.cid;
+    await this.canSubmit(cid);
     const config = contest.config;
     // 判断是否成立：
     const sql = `
@@ -340,6 +363,7 @@ export class ContestService {
     // 得到cid
     const contest = await this.getContestByCode(code);
     const cid = contest.cid;
+    await this.canSubmit(cid);
 
     // 判断是否成立：
     const sql = `
