@@ -166,7 +166,7 @@ export class ContestService {
 
   async getOneContestSummary (cid: number) {
     const sql = `
-      select enroll.detail,
+      select enroll.eid as eid, enroll.detail,
         user.uid as uid, user.username as username,
         user.usertype as usertype, user.name as name,
         school.sid as sid, school.name as school_name
@@ -197,7 +197,10 @@ export class ContestService {
       }
 
       const index = uid_map_index[item.uid];
-      response[index].students.push(JSON.parse(item.detail));
+      response[index].students.push({
+        eid: item.eid,
+        ...JSON.parse(item.detail)
+      });
     }
 
     // return response;
@@ -414,7 +417,7 @@ export class ContestService {
     `;
 
     await this.mysqlService.query(sql, [
-      body.due || contest.due,
+      body.due ? new Date(body.due) : undefined || contest.due,
       body.code || contest.code,
       body.extra || contest.extra,
       body.title || contest.title,
@@ -422,5 +425,49 @@ export class ContestService {
     ]);
 
     return await this.getContestByCid(cid);
+  }
+
+  async deleteManyStudentsInOneContest (cid: number, eid: number[]) {
+    const sql = `
+      DELETE FROM enroll
+      WHERE cid = ? and eid in (?)
+    `;
+
+    await this.mysqlService.query(sql, [cid, eid]);
+
+    return {
+      msg: '删除报名记录完成'
+    }
+  }
+
+  async updateStudentInOneContest (cid: number, eid: number, info: any) {
+    const contest = await this.getContestByCid(cid);
+    const config = contest.config;
+    const keys = Object.keys(info);
+    const r = {};
+    // 判断config所有元素都在info的键中
+    for (const key of config) {
+      if (keys.indexOf(key) === -1) {
+        r[key] = ''
+      } else {
+        r[key] = info[key];
+      }
+    }
+    // 更新enroll
+    const sql = `
+      update enroll
+      set detail = ?
+      where eid = ?;
+    `;
+
+    await this.mysqlService.query(sql, [JSON.stringify(r), eid]);
+    return {
+      msg: '更新成功'
+    }
+  }
+
+  async adminAddOneStudentToOneContest (uid: number, cid: number, body: any) {
+    const contest = await this.getContestByCid(cid);
+    return await this.addOneStudentToOneContest(uid, contest.code, body);
   }
 }

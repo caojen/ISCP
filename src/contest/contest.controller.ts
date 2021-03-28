@@ -137,6 +137,43 @@ export class ContestController {
     return await this.contestService.deleteOneStudentInOneContest(uid, code, eid);
   }
 
+  @Post('admin/:cid/students')
+  @UseGuards(AdminRequired)
+  async deleteManyStudentsInOneContest (
+    @Param() param: { cid: number },
+    @Body() body: { eid: number[] }
+  ) {
+    const { cid } = param;
+    const { eid } = body;
+    shouldBeInteger([cid, ...eid]);
+
+    return await this.contestService.deleteManyStudentsInOneContest(cid, eid);
+  }
+
+  @Put('admin/:cid/student/:eid')
+  @UseGuards(AdminRequired)
+  async updateStudentInOneContest (
+    @Param() param: { cid: number, eid: number },
+    @Body() body: any
+  ) {
+    const { cid, eid } = param;
+    shouldBeInteger([cid, eid]);
+    return await this.contestService.updateStudentInOneContest(cid, eid, body);
+  }
+
+  @Post('admin/:cid/student')
+  @UseGuards(AdminRequired)
+  async adminAddOneStudentToOneContest (
+    @Req() request: any,
+    @Param() param: { cid: number },
+    @Body() body: any
+  ) {
+    const uid = request.user.uid;
+    const { cid } = param;
+    shouldBeInteger([cid]);
+    return await this.contestService.adminAddOneStudentToOneContest(uid, cid,body)
+  }
+
   @Get(':cid')
   @UseGuards(AdminRequired)
   async getContestByCid (@Param() param: { cid: number }) {

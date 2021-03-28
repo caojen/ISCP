@@ -71,6 +71,7 @@ export class AdminRequired implements CanActivate {
       const admin = await this.userService.getUser(sessionId);
       if (admin.usertype === 'admin') {
         request.admin = admin;
+        request.user = admin;
         return true;
       }
     }
