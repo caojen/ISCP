@@ -14,8 +14,8 @@ FROM node:14-alpine
 
 WORKDIR /app
 
-COPY --from=build /workdir/node_modules .
-COPY --from=build /workdir/dist .
+COPY --from=build /workdir/node_modules ./node_modules
+COPY --from=build /workdir/dist ./dist
 
 EXPOSE 5003
 
