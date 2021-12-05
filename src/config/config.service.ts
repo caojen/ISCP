@@ -27,7 +27,7 @@ export class ConfigService {
         host: "127.0.0.1",
         port: 3306,
         username: "root",
-        password: "opentextfile+123",
+        password: "OPENtextfile+123",
         database: "iscp"
       };
       config.redis = {
