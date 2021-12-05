@@ -24,14 +24,14 @@ export class ConfigService {
     const config = new Config;
     if (env === "test") {
       config.mysql = {
-        host: "127.0.0.1",
+        host: "172.17.0.1",
         port: 3306,
         username: "root",
         password: "OPENtextfile+123",
         database: "iscp"
       };
       config.redis = {
-        host: "127.0.0.1",
+        host: "172.17.0.1",
         port: 6379,
         password: "123456"
       }
