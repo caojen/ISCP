@@ -74,4 +74,18 @@ export class UserController {
     const { password } =  body;
     return await this.userService.updatePassword(uid, password);
   }
+
+  @Post('password/find')
+  async findPassword(@Body() body: {
+    username: string,
+    name: string,
+    school: string
+  }) {
+    shouldNotNull([body.username, body.name, body.school]);
+    return await this.userService.findPassword(
+      body.username,
+      body.name,
+      body.school
+    );
+  }
 }

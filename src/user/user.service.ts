@@ -239,10 +239,37 @@ export class UserService {
       set password=?
       where uid=?;
     `;
-    console.log('update password', uid, truePass);
     await this.mysqlService.query(update, [truePass, uid]);
     return {
       msg: '修改密码成功'
+    }
+  }
+
+  async findPassword(username: string, name: string, school: string) {
+    // try to verify if user exists
+
+    const sql = `
+      SELECT user.uid AS id
+      FROM user
+        LEFT JOIN school ON user.sid = school.sid
+      WHERE user.username = ?
+        AND user.name = ?
+        AND school.name = ?
+    `;
+
+    const res = await this.mysqlService.query(sql, [username, name, school]);
+    if (res.length == 0) {
+      // fatal:
+      throw new HttpException({
+        msg: '身份验证失败，用户名不存在或信息错误'
+      }, 403);
+    } else {
+      const id = res[0].id;
+      await this.updatePassword(id, "12345678");
+
+      return {
+        msg: '密码重置成功'
+      }
     }
   }
 }

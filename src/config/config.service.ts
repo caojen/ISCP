@@ -27,13 +27,13 @@ export class ConfigService {
         host: "127.0.0.1",
         port: 3306,
         username: "root",
-        password: "OPENtextfile+123",
+        password: "opentextfile+123",
         database: "iscp"
       };
       config.redis = {
         host: "127.0.0.1",
         port: 6379,
-        password: "OPENtextfile+123"
+        password: "123456"
       }
     } else if (env === "dev") {
       config.mysql = {
