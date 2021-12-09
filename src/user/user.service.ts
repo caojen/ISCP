@@ -245,7 +245,7 @@ export class UserService {
     }
   }
 
-  async findPassword(username: string, name: string, school: string) {
+  async findPassword(username: string, name: string, school: string, password: string) {
     // try to verify if user exists
 
     const sql = `
@@ -265,7 +265,7 @@ export class UserService {
       }, 403);
     } else {
       const id = res[0].id;
-      await this.updatePassword(id, "12345678");
+      await this.updatePassword(id, password);
 
       return {
         msg: '密码重置成功'

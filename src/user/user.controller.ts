@@ -79,9 +79,10 @@ export class UserController {
   async findPassword(@Body() body: {
     username: string,
     name: string,
-    school: string
+    school: string,
+    password: string
   }) {
-    shouldNotNull([body.username, body.name, body.school]);
+    shouldNotNull([body.username, body.name, body.school, body.password]);
     return await this.userService.findPassword(
       body.username,
       body.name,
