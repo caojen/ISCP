@@ -86,7 +86,8 @@ export class UserController {
     return await this.userService.findPassword(
       body.username,
       body.name,
-      body.school
+      body.school,
+      body.password
     );
   }
 }
