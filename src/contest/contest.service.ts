@@ -402,6 +402,10 @@ export class ContestService {
       throw new HttpException({
         msg: '未检测到学生，请检测文件内容是否正确'
       }, 406)
+    } else if (json.length > 100) {
+      throw new HttpException({
+        msg: '单次上传不允许超过100个学生，请检查文件，删除不必要的空行，或分批次上传。'
+      }, 406)
     }
 
     return await this.addManyStudentsToOneContest(uid, code, json);
